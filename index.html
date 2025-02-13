@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cuestionario de Comprensión - Guía de Inversiones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts (mismos que la aplicación principal) -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Confetti (librería para efecto de confeti) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #005f6a;
+      --element-bg: #005f6a;
+      --element-bg-light: #007b8c;
+      --element-bg-dark: #00424c;
+      --text-color: #ffffff;
+      --text-color-dark: #f0f0f0;
+      --border-radius: 15px;
+    }
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    .quiz-container {
+      max-width: 800px;
+      margin: 120px auto 40px;
+      background: var(--element-bg);
+      border-radius: var(--border-radius);
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.4), -5px -5px 15px rgba(255,255,255,0.7);
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-family: 'Roboto', sans-serif;
+      margin-bottom: 20px;
+    }
+    .progress {
+      height: 20px;
+      background: var(--element-bg-dark);
+      border-radius: var(--border-radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #4CAF50;
+      transition: width 0.3s;
+    }
+    .question-number {
+      font-size: 16px;
+      margin-bottom: 10px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .question {
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-family: 'Open Sans', sans-serif;
+    }
+    .answers {
+      list-style: none;
+      padding: 0;
+    }
+    .answers li {
+      margin-bottom: 10px;
+    }
+    .answer-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: var(--border-radius);
+      background: var(--element-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(0,0,0,0.4), -5px -5px 10px rgba(255,255,255,0.7);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .answer-btn:hover {
+      background: var(--element-bg-light);
+      transform: translateY(-2px);
+    }
+    .correct {
+      background: #4CAF50 !important;
+    }
+    .incorrect {
+      background: #F44336 !important;
+    }
+    .disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .score {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 20px;
+      font-family: 'Roboto', sans-serif;
+    }
+    .restart-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: var(--element-bg-light);
+      color: var(--text-color);
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px rgba(0,0,0,0.4), -5px -5px 10px rgba(255,255,255,0.7);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      background: var(--element-bg-dark);
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Cuestionario de Comprensión</h1>
+    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    <div id="quiz"></div>
+    <div class="score" id="score"></div>
+  </div>
+
+  <script>
+    // Array de 15 preguntas
+    const questions = [
+      {
+        question: "¿Cuál es el propósito principal de la aplicación \"Guía de Inversiones en Argentina\"?",
+        options: [
+          "Brindar asesoramiento financiero profesional en tiempo real.",
+          "Educar e informar sobre las opciones de inversión en Argentina de forma sencilla.",
+          "Permitir realizar operaciones bursátiles directas.",
+          "Publicar noticias económicas y actualizaciones diarias."
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué significa el término \"liquidez\" en el contexto de las inversiones?",
+        options: [
+          "La facilidad para convertir un activo en efectivo.",
+          "La rentabilidad que se puede obtener.",
+          "El nivel de riesgo asociado a la inversión.",
+          "La diversificación de la cartera."
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Cuál es la principal diferencia entre el Panel Merval y el Panel General en el mercado de acciones?",
+        options: [
+          "El Panel Merval agrupa a las acciones más negociadas y representativas, mientras que el Panel General incluye aquellas con menor liquidez y mayor volatilidad.",
+          "El Panel Merval se compone exclusivamente de acciones del sector energético.",
+          "El Panel General incluye solo acciones internacionales.",
+          "No existe diferencia entre ambos paneles."
+        ],
+        answer: 0
+      },
+      {
+        question: "Respecto a los Bonos Soberanos en Argentina, ¿cuál afirmación es correcta?",
+        options: [
+          "Solo se emiten en dólares.",
+          "Pueden emitirse tanto en pesos como en dólares y pueden tener tasas fijas o variables.",
+          "Son instrumentos completamente exentos de riesgo.",
+          "No se ajustan por inflación."
+        ],
+        answer: 1
+      },
+      {
+        question: "Dentro de \"Instrumentos Alternativos\", ¿cuál de los siguientes NO se menciona?",
+        options: [
+          "CEDEARs",
+          "ETFs",
+          "Bonos Soberanos",
+          "Cauciones"
+        ],
+        answer: 2
+      },
+      {
+        question: "¿Qué herramienta permite calcular el monto final de una inversión?",
+        options: [
+          "Test de Perfil",
+          "Calculadora de Inversiones",
+          "Generador de Prompts Financieros",
+          "Seguimiento BTC/USD"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Cuál es la función principal del \"Generador de Prompts Financieros\"?",
+        options: [
+          "Generar un análisis detallado y un prompt para un instrumento financiero.",
+          "Calcular los intereses generados en una inversión.",
+          "Evaluar el perfil de riesgo del inversor.",
+          "Mostrar gráficos en tiempo real de los activos."
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué evalúa el \"Test de Perfil\" de la aplicación?",
+        options: [
+          "El conocimiento técnico sobre inversiones.",
+          "La tolerancia al riesgo y el horizonte de inversión del usuario.",
+          "La capacidad para operar en plataformas de trading.",
+          "La diversificación de la cartera de inversión."
+        ],
+        answer: 1
+      },
+      {
+        question: "En la sección de Criptomonedas, ¿qué información se muestra sobre el BTC/USD?",
+        options: [
+          "Solo su precio actual.",
+          "Precio actual, variación 24h, máximo 24h y un gráfico con línea de tendencia.",
+          "Únicamente el cambio porcentual diario.",
+          "Volumen de negociación y capitalización de mercado."
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Cuál es la principal diferencia entre un Plazo Fijo tradicional y un Plazo Fijo UVA?",
+        options: [
+          "El Plazo Fijo UVA se ajusta por inflación mediante el índice CER, mientras que el tradicional no.",
+          "El Plazo Fijo UVA ofrece una tasa fija sin variaciones.",
+          "El Plazo Fijo tradicional se paga en moneda extranjera.",
+          "No existe diferencia en su funcionamiento."
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué distingue a los CEDEARs de las acciones tradicionales?",
+        options: [
+          "Se negocian únicamente en dólares.",
+          "Permiten invertir en acciones extranjeras sin operar directamente en mercados internacionales.",
+          "Ofrecen rendimientos fijos garantizados.",
+          "Solo se negocian en la Bolsa de Comercio de Buenos Aires."
+        ],
+        answer: 1
+      },
+      {
+        question: "Los ETFs permiten a los inversores:",
+        options: [
+          "Invertir en una única acción de una empresa.",
+          "Acceder a una cartera diversificada que replica un índice o sector.",
+          "Garantizar retornos fijos a lo largo del tiempo.",
+          "Invertir exclusivamente en bonos gubernamentales."
+        ],
+        answer: 1
+      },
+      {
+        question: "En las Cauciones, ¿qué papel cumple la garantía?",
+        options: [
+          "Incrementa la rentabilidad de la operación.",
+          "Asegura el cumplimiento de la operación, reduciendo el riesgo de contraparte.",
+          "Se usa para determinar la tasa de interés.",
+          "No es necesaria, ya que son operaciones sin riesgo."
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Cuál es la función principal de las Letras en Argentina?",
+        options: [
+          "Financiar proyectos de infraestructura a largo plazo.",
+          "Proporcionar financiamiento a corto plazo con alta liquidez.",
+          "Servir como instrumento para invertir en acciones extranjeras.",
+          "Garantizar dividendos fijos a los inversores."
+        ],
+        answer: 1
+      },
+      {
+        question: "Las Obligaciones Negociables son utilizadas por las empresas para:",
+        options: [
+          "Financiar proyectos o refinanciar deudas mediante la emisión de títulos en el mercado secundario.",
+          "Ofrecer retornos garantizados sin riesgo alguno.",
+          "Invertir en criptomonedas.",
+          "Reemplazar completamente los préstamos bancarios."
+        ],
+        answer: 0
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let correctFirstAttempt = 0;
+    const quizContainer = document.getElementById('quiz');
+    const scoreContainer = document.getElementById('score');
+    const progressBar = document.getElementById('progress-bar');
+
+    // Controla si el usuario ha intentado responder por primera vez en la pregunta actual
+    let firstAttemptMade = false;
+
+    function showQuestion(index) {
+      quizContainer.innerHTML = "";
+      scoreContainer.innerHTML = "";
+      firstAttemptMade = false;
+      if (index >= questions.length) {
+        // Calcular porcentaje de aciertos en el primer intento
+        const percentage = Math.round((correctFirstAttempt / questions.length) * 100);
+        // Mostrar resumen final
+        quizContainer.innerHTML = "<h2>¡Finalizaste el cuestionario!</h2>";
+        scoreContainer.innerHTML = `
+          <p>Tu calificación final: ${score} de ${questions.length}</p>
+          <p>Preguntas respondidas correctamente en el primer intento: ${correctFirstAttempt}</p>
+          <p>Porcentaje de aciertos en el primer intento: ${percentage}%</p>
+          <p>Preguntas que tuvieron al menos un error: ${questions.length - correctFirstAttempt}</p>
+          ${percentage >= 80 ? '<h3>¡Felicitaciones!!!</h3>' : ''}
+          <button class="restart-btn" onclick="restartQuiz()">Volver a generar el Test</button>
+        `;
+        // Si el porcentaje es mayor o igual al 80%, lanzar confeti
+        if (percentage >= 80) {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+        progressBar.style.width = "100%";
+        return;
+      }
+
+      // Mostrar número de pregunta
+      const qNumber = document.createElement('div');
+      qNumber.className = "question-number";
+      qNumber.textContent = `Pregunta ${index + 1} de ${questions.length}`;
+      quizContainer.appendChild(qNumber);
+
+      const q = questions[index];
+      const questionDiv = document.createElement('div');
+      questionDiv.className = "question";
+      questionDiv.textContent = q.question;
+      quizContainer.appendChild(questionDiv);
+
+      const answersList = document.createElement('ul');
+      answersList.className = "answers";
+      q.options.forEach((option, i) => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.className = "answer-btn";
+        btn.textContent = option;
+        btn.addEventListener('click', () => {
+          // Si es el primer intento para esta pregunta, registrar
+          if (!firstAttemptMade) {
+            firstAttemptMade = true;
+            if (i === q.answer) {
+              correctFirstAttempt++;
+            }
+          }
+          // Si la respuesta es correcta
+          if (i === q.answer) {
+            btn.classList.add("correct");
+            // Deshabilitar todas las opciones
+            document.querySelectorAll(".answer-btn").forEach(b => b.classList.add("disabled"));
+            score++;
+            setTimeout(() => {
+              currentQuestion++;
+              updateProgress();
+              showQuestion(currentQuestion);
+            }, 1000);
+          } else {
+            // Si es incorrecta, marcar en rojo y deshabilitar ese botón
+            btn.classList.add("incorrect", "disabled");
+          }
+        });
+        li.appendChild(btn);
+        answersList.appendChild(li);
+      });
+      quizContainer.appendChild(answersList);
+    }
+
+    function updateProgress() {
+      const progressPercent = (currentQuestion / questions.length) * 100;
+      progressBar.style.width = progressPercent + "%";
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      correctFirstAttempt = 0;
+      updateProgress();
+      showQuestion(currentQuestion);
+    }
+
+    showQuestion(currentQuestion);
+  </script>
+</body>
+</html>
